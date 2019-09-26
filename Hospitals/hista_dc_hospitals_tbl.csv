@@ -1,0 +1,12 @@
+Latitude,Longitude,Count,Code,Hospital Name,Address,City,State,Zip Code,Website,Type,,Beds
+38.92928442,-77.01024721,1,Hosp_013,Veterans Affairs Medical Center,50 IRVING STREET NW,Washington,DC,20310,http://www.washingtondc.va.gov/,Specialty,NULL,NULL
+38.94137589,-76.98104112,2,Hosp_008,The HSC Pediatric Center,1731 BUNKER HILL ROAD NE,Washington,DC,20017,http://www.hscpediatriccenter.org/,Specialty,NULL,130
+38.93622859,-77.10924122,3,Hosp_012,Sibley Memorial Hospital,5255 LOUGHBORO ROAD NW,Washington,DC,20016,http://www.sibley.org/,Hospital,NULL,369
+38.94329506,-76.99123161,5,Hosp_011,Providence Hospital,1150 VARNUM STREET NE,Washington,DC,20017,http://www.provhosp.org/,Hospital,NULL,393
+38.92965974,-77.01565059,6,Hosp_014,MedStar Washington Hospital Center,110 IRVING STREET NW,Washington,DC,20010,https://www.medstarhealth.org/washington/pages/default.aspx,Hospital,NULL,926
+38.9175562,-77.02009604,7,Hosp_009,Howard University Hospital,2041 GEORGIA AVENUE NW,Washington,DC,20001,http://www.huhealthcare.com,Hospital,Y,482
+38.93055031,-77.01334577,8,Hosp_010,MedStar National Rehabilitation Hospital,102 IRVING STREET NW,Washington,DC,20010,https://www.medstarhealth.org/nrh/pages/default.aspx,Specialty,NULL,137
+38.92727387,-77.01439601,9,Hosp_001,Children's National Medical Center,111 MICHIGAN AVENUE NW,Washington,DC,20010,http://www.childrensnational.org/,Specialty,Y,313
+38.91205804,-77.0752833,11,Hosp_005,MedStar Georgetown University Hospital,3800 RESERVOIR ROAD NW,Washington,DC,20007,https://www.medstarhealth.org/georgetown/Pages/default.aspx,Hospital,Y,609
+38.90132679,-77.05063898,12,Hosp_015,George Washington University Hospital,900 23RD STREET NW,Washington,DC,20037,http://gwhospital.com/,Hospital,NULL,385
+38.92864575,-77.0135996,17,Hosp_003,MedStar Health,100 IRVING STREET NW,Washington,DC,20010,https://www.medstarhealth.org/washington/pages/default.aspx,Specialty,NULL,NULL
