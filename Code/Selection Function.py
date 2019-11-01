@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[125]:
+# In[8]:
 
 
 import pandas as pd
@@ -106,28 +106,40 @@ def select(user_type,age,income,interest,grocery,commuting,school=None,family=["
             filters.append("Ranking of Cafe")
 
         data=data.sort_values(by=filters,ascending=False)
-        
-    if user_type=="Student":
-        data=pd.concat([data[data["Schools"].str.contains(school)],data[-data["Schools"].str.contains(school)]])
-        
-        if grocery=="Freshness":
-            filters.append("Ranking of Grocery|Freshness")
-        elif grocery=="Discount":
-            filters.append("Ranking of Grocery|Bargain")
-            
-        if ("Parks" or "Hiking") in interest:
-            filters.append("Availability of Parks")
-            filters.append("Availability of National Parks")
-        if "Gyms" in interest:
-            filters.append("Availability of Sport Facility")
-        if "Bars" in interest:
-            filters.append("Ranking of Bar")
-        if "Cafe" in interest:
-            filters.append("Ranking of Cafe")
-        if "Library" in interest:
-            filters.append("Availablity of Library")
-            
-        data=data.sort_values(by=filters,ascending=False)
+         
+    return data[0:5]
+
+
+
+def select_stu(grocery,interest,school=None,data=data):
+    
+    filters=[]
+    data=pd.concat([data[data["Schools"].str.contains(school)],data[-data["Schools"].str.contains(school)]])
+
+    if grocery=="Freshness":
+        filters.append("Ranking of Grocery|Freshness")
+    elif grocery=="Discount":
+        filters.append("Ranking of Grocery|Bargain")
+
+    if ("Parks" or "Hiking") in interest:
+        filters.append("Availability of Parks")
+        filters.append("Availability of National Parks")
+    if "Gyms" in interest:
+        filters.append("Availability of Sport Facility")
+    if "Bars" in interest:
+        filters.append("Ranking of Bar")
+    if "Cafe" in interest:
+        filters.append("Ranking of Cafe")
+    if "Library" in interest:
+        filters.append("Availablity of Library")
+
+    data=data.sort_values(by=filters,ascending=False)
     
     return data[0:5]
+
+
+# In[ ]:
+
+
+
 
