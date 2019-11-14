@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[61]:
+# In[4]:
 
 
 import pandas as pd
@@ -14,6 +14,17 @@ def indexing(cur_zip,new_zip,grades):
     grades["Availability of Trains"]=grades.pop("Public Transportation")
     grades["Driving Area"]=grades.pop("Traffic Situation")
     grades["Ranking of Delivery Restaurant"]=grades.pop("Restaurant Delivery")
+    grades["Ranking of Bakery"]=grades.pop("Bakery")
+    grades["Ranking of Bar"]=grades.pop("Bar")
+    grades["Ranking of Cafe"]=grades.pop("Cafe")
+    grades["Ranking of Child Care"]=grades.pop("Child Care")
+    grades["Ranking of Elementary School"]=grades.pop("Elementary School")
+    grades["Ranking of Middle School"]=grades.pop("Middle School")
+    grades["Ranking of High School"]=grades.pop("High School")
+    grades["Ranking of Hospital"]=grades.pop("Hospital")
+    grades["Availability of Parks"]=grades.pop("Parks")
+    grades["Availability of Pharmacy"]=grades.pop("Pharmacy")
+    grades["Availability of Sport Facility"]=grades.pop("Sport Facility")
     keys=list(grades)
     cur_data=data[data["Zip Code"]==cur_zip]
     new_data=data[data["Zip Code"]==new_zip]
@@ -34,6 +45,17 @@ def indexing(cur_zip,new_zip,grades):
     index["Public Transportation"]=index.pop("Availability of Trains")
     index["Traffic Situation"]=index.pop("Driving Area")
     index["Restaurant Delivery"]=index.pop("Ranking of Delivery Restaurant")
+    index["Bakery"]=index.pop("Ranking of Bakery")
+    index["Bar"]=index.pop("Ranking of Bar")
+    index["Cafe"]=index.pop("Ranking of Cafe")
+    index["Child Care"]=index.pop("Ranking of Child Care")
+    index["Elementary School"]=index.pop("Ranking of Elementary School")
+    index["Middle School"]=index.pop("Ranking of Middle School")
+    index["High School"]=index.pop("Ranking of High School")
+    index["Hospital"]=index.pop("Ranking of Hospital")
+    index["Parks"]=index.pop("Availability of Parks")
+    index["Pharmacy"]=index.pop("Availability of Pharmacy")
+    index["Sport Facility"]=grades.pop("Availability of Sport Facility")
     index["Total"]=sum(index.values())
     
     return index
