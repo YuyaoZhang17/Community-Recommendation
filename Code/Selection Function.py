@@ -1,18 +1,34 @@
-#!/usr/bin/env python
-# coding: utf-8
 
-# In[8]:
-
+#%%
 
 import pandas as pd
 import numpy as np
+from DistanceRanking import DistRank
+from Ranking import ranking
 
-data=pd.read_csv("data.csv",dtype={"Zip Code":str})
+
+df=pd.read_csv("data.csv",dtype={"Zip Code":str})
 
 
-def select(user_type,age,income,interest,grocery,commuting,school=None,family=["Single"],data=data):
+
+
+# creating safety ranking dynamically after users select their preference
+def safety_consideration(safety,data):
+    safety_list=["Property | Theft","Violent | Sex Abuse","Violent | Homicide","Property | Burglary","Property | Arson",
+    "Violent | Assault with Dangerous Weapon","Violent | Robbery"]
+    not_selected = list(set(safety_list) ^ set(safety))
+    data["Ranking of Crime"]=ranking((data[safety]*0.2).apply(sum,axis=1)+(data[not_selected]*0.1).apply(sum,axis=1))
+    return data
+
+def select(user_type,age,income,interest,grocery,safety,commuting,school=None,address=None,family=["Single"],data=df):
+
     filters=[]
     
+    data=safety_consideration(safety,data)
+    # if user type in their address, creating traffic situation ranking dynamically
+    if address!=None:
+        data=data.merge(DistRank(address),on=["Zip Code","Driving Area","Cycling Area","Walking Area"])
+
     if age<55:
         thre=income*0.35
     else:
@@ -38,22 +54,26 @@ def select(user_type,age,income,interest,grocery,commuting,school=None,family=["
             filters.append("Ranking of High School")
             filters.append("Ranking of Crime")
 
+        
+
         if commuting=="Car":
             filters.append("Driving Area")
         elif commuting=="Bikes":
             filters.append("Cycling Area")
         elif commuting=="Public Transportation":
             filters.append("Availability of Trains")
+        elif commuting=="By Foot":
+            filters.append("Walking Area")
             
         if grocery=="Freshness":
             filters.append("Ranking of Grocery|Freshness")
         elif grocery=="Discount":
             filters.append("Ranking of Grocery|Bargain")
         
-        if ("Parks" or "Hiking") in interest:
+        if "Outdoor Activities" in interest:
             filters.append("Availability of Parks")
             filters.append("Availability of National Parks")
-        if "Gyms" in interest:
+        if "Sports Facility" in interest:
             filters.append("Availability of Sport Facility")
         if "Bars" in interest:
             filters.append("Ranking of Bar")
@@ -89,16 +109,18 @@ def select(user_type,age,income,interest,grocery,commuting,school=None,family=["
             filters.append("Cycling Area")
         elif commuting=="Public Transportation":
             filters.append("Availability of Trains")
+        elif commuting=="By Foot":
+            filters.append("Walking Area")
             
         if grocery=="Freshness":
             filters.append("Ranking of Grocery|Freshness")
         elif grocery=="Discount":
             filters.append("Ranking of Grocery|Bargain")
         
-        if ("Parks" or "Hiking") in interest:
+        if "Outdoor Activities" in interest:
             filters.append("Availability of Parks")
             filters.append("Availability of National Parks")
-        if "Gyms" in interest:
+        if "Sports Facility" in interest:
             filters.append("Availability of Sport Facility")
         if "Bars" in interest:
             filters.append("Ranking of Bar")
@@ -106,14 +128,18 @@ def select(user_type,age,income,interest,grocery,commuting,school=None,family=["
             filters.append("Ranking of Cafe")
 
         data=data.sort_values(by=filters,ascending=False)
-         
+
     return data[0:5]
 
 
 
-def select_stu(grocery,interest,school=None,data=data):
+def select_stu(grocery,interest,safety,school=None,data=df):
+
     
     filters=[]
+
+    data=safety_consideration(safety,data)
+    
     data=pd.concat([data[data["Schools"].str.contains(school)],data[-data["Schools"].str.contains(school)]])
 
     if grocery=="Freshness":
@@ -121,25 +147,26 @@ def select_stu(grocery,interest,school=None,data=data):
     elif grocery=="Discount":
         filters.append("Ranking of Grocery|Bargain")
 
-    if ("Parks" or "Hiking") in interest:
+    if "Outdoor Activities" in interest:
         filters.append("Availability of Parks")
         filters.append("Availability of National Parks")
-    if "Gyms" in interest:
+    if "Sports Facility" in interest:
         filters.append("Availability of Sport Facility")
     if "Bars" in interest:
         filters.append("Ranking of Bar")
     if "Cafe" in interest:
         filters.append("Ranking of Cafe")
     if "Library" in interest:
-        filters.append("Availablity of Library")
+        filters.append("Availability of Library")
 
     data=data.sort_values(by=filters,ascending=False)
     
     return data[0:5]
 
 
-# In[ ]:
 
 
+select("Home Buyer",45,150000,["Parks","Cafe"],"Freshness",["Violent | Homicide","Property | Arson","Violent | Sex Abuse"],"Public Transportation",school=None,family=["Spouse","Kids 6 to 12"],data=df)
 
 
+# %%
