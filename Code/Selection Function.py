@@ -5,12 +5,11 @@ import pandas as pd
 import numpy as np
 from DistanceRanking import DistRank
 from Ranking import ranking
+from Distance import distance
+import random
 
-
+#%%
 df=pd.read_csv("data.csv",dtype={"Zip Code":str})
-
-
-
 
 # creating safety ranking dynamically after users select their preference
 def safety_consideration(safety,data):
@@ -27,16 +26,17 @@ def select(user_type,age,income,interest,grocery,safety,commuting,school=None,ad
     data=safety_consideration(safety,data)
     # if user type in their address, creating traffic situation ranking dynamically
     if address!=None:
-        data=data.merge(DistRank(address),on=["Zip Code","Driving Area","Cycling Area","Walking Area"])
+        data=data.merge(DistRank(address),on=["Zip Code","Driving Area","Cycling Area","Walking Area"],how="left")
 
     if age<55:
-        thre=income*0.35
+        thre=income*0.30
     else:
-        thre=income*0.45
+        thre=income*0.40
         filters.append("Availability of Hospital")
         
     if user_type=="Renter":
         data=data[(data["Rental for Studio"]<thre)|(data["Rental for 1 Bed"]<thre)|(data["Rental for 2 Beds"]<thre)]
+
         
         if "Kids under 6" in family:
             filters.append("Ranking of Child Care")
@@ -84,7 +84,7 @@ def select(user_type,age,income,interest,grocery,safety,commuting,school=None,ad
             
             
     if user_type=="Home Buyer":
-        data=data[(data["Rental for Studio"]<thre)|(data["Rental for 1 Bed"]<thre)|(data["Rental for 2 Beds"]<thre)]
+        data=data[(data["Price for Sale|Studio"]<thre)|(data["Price for Sale|1 Bed"]<thre)|(data["Price for Sale|2 Beds"]<thre)]
         
         if "Kids under 6" in family:
             filters.append("Ranking of Child Care")
@@ -129,7 +129,7 @@ def select(user_type,age,income,interest,grocery,safety,commuting,school=None,ad
 
         data=data.sort_values(by=filters,ascending=False)
 
-    return data[0:5]
+    return data
 
 
 
@@ -161,12 +161,13 @@ def select_stu(grocery,interest,safety,school=None,data=df):
 
     data=data.sort_values(by=filters,ascending=False)
     
-    return data[0:5]
+    return data
 
 
 
 
-select("Home Buyer",45,150000,["Parks","Cafe"],"Freshness",["Violent | Homicide","Property | Arson","Violent | Sex Abuse"],"Public Transportation",school=None,family=["Spouse","Kids 6 to 12"],data=df)
+aa=select("Home Buyer",45,150000,["Parks","Cafe"],"Freshness",["Violent | Homicide","Property | Arson","Violent | Sex Abuse"],"Public Transportation",school=None,family=["Spouse","Kids 6 to 12"],data=df,address="80 M St SE, Washington, DC 20003")
 
+print(aa)
 
 # %%

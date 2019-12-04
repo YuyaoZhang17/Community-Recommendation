@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 
-def distance(address: str, zip_code: str, ty_pe: str, time: int):
+def distance(loc: tuple, zip_code: str, ty_pe: str, time: int):
     # the function of calculating angles
     def angle(v1, v2):
         dx1 = v1[0]
@@ -33,13 +33,7 @@ def distance(address: str, zip_code: str, ty_pe: str, time: int):
 
     cores["Core"] = cores["Core"].map(lambda x: eval(x))
 
-    from geopy.geocoders import Nominatim
     from geopy import distance
-
-    geolocator = Nominatim(user_agent="distance")
-    location = geolocator.geocode(address)
-    # loc is the location of address
-    loc = (location.longitude, location.latitude)
 
     core = cores[cores["Zip Code"] ==
                  zip_code]["Core"].iloc[0]  # the start point
@@ -74,11 +68,7 @@ def distance(address: str, zip_code: str, ty_pe: str, time: int):
 # %%
 
 
-print(distance("1440 G St NW Washington, DC 20005", "20005", "driving", 60))
-
-
-# %%
-print(distance("1440 G St NW Washington, DC 20005", "20001", "driving", 30))
+#print(distance((-77.0326720030138, 38.8982342065232), "20006", "walking", 30))
 
 
 # %%
