@@ -91,6 +91,7 @@ def indexing(cur_zip: str, new_zip: str, grades, safety, address=None):
     frame["Current Score"] = cur_score.values()
     frame["New Score"] = new_score.values()
     frame["Change"] = index.values()
+    frame = frame[frame["Current Score"] != 0]
 
     return frame
 
@@ -102,7 +103,7 @@ dic["Availability of Bakery"] = 5
 dic["Rating of Bakery"] = 5
 dic["Price Level of Bakery"] = 3
 dic["Availability of Bar"] = 4
-dic["Rating of Bar"] = 3
+dic["Rating of Bar"] = 0
 dic["Price Level of Bar"] = 2
 dic["Availability of Cafe"] = 5
 dic["Rating of Cafe"] = 4
@@ -126,7 +127,8 @@ safety = ["Property | Theft",
           "Violent | Assault with Dangerous Weapon", "Violent | Homicide"]
 
 # %%
-indexing("20032", "20024", dic, safety, "80 M St SE, Washington, DC 20003")
-
+aa = indexing("20032", "20024", dic, safety,
+              "80 M St SE, Washington, DC 20003")
+print(aa)
 
 # %%

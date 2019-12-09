@@ -1,6 +1,7 @@
 # %%
 import pandas as pd
 import numpy as np
+from Ranking import ranking
 
 
 # %%
@@ -104,6 +105,7 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
     frame["Current Score"] = cur_score.values()
     frame["New Score"] = new_score.values()
     frame["Change"] = index.values()
+    frame = frame[frame["Current Score"] != 0]
 
     return frame
 
@@ -159,12 +161,18 @@ dic["Traffic Situation"] = 5
 dic["Grocery | Freshness"] = 1
 dic["Grocery | Bargain"] = 1
 
+
+safety = ["Property | Burglary",
+          "Violent | Assault with Dangerous Weapon", "Violent | Homicide"]
+
+
+df = safety_consideration(safety, df)
 # %%
 
 aa = gov_sti("20002", dic, 300000, None, df)
 
 # %%
-aa[aa["Zip Code"] == "20005"]["Impact"].iloc[0]
-
+b = aa[aa["Zip Code"] == "20005"]["Impact"].iloc[0]
+print(b)
 
 # %%

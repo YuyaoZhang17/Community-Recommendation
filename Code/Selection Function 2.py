@@ -77,6 +77,7 @@ def indexing2(zip_code: str, grades_dict, data):
     
     frame = pd.DataFrame(list(zip_score)).rename(columns={0: "Features"})
     frame["Area Score"]=zip_score.values()
+    frame=frame[frame["Area Score"]!=0]
 
 
 
@@ -133,7 +134,7 @@ dic["Rating of Bakery"] = 4
 dic["Price Level of Bakery"] = 2
 dic["Availability of Bar"] = 3
 dic["Rating of Bar"] = 2
-dic["Price Level of Bar"] = 3
+dic["Price Level of Bar"] = 0
 dic["Availability of Cafe"] = 3
 dic["Rating of Cafe"] = 3
 dic["Price Level of Cafe"] = 1
@@ -181,6 +182,6 @@ def select_stu(safety,grades_dict,school=None,data=df):
 
 #%%
 
-select_stu(safety,dic,"The Georgetown University",df)
-
+aa=select_stu(safety,dic,"The Georgetown University",df)
+print(aa)
 # %%
