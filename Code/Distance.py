@@ -26,7 +26,7 @@ def distance(loc: tuple, zip_code: str, ty_pe: str, time: int):
                 included_angle = 360 - included_angle
         return included_angle
 
-    cores = pd.read_csv("cores.csv")
+    cores = pd.read_csv("cores.csv")  # the center of each community
 
     cores = cores.rename(columns={"Unnamed: 0": "Zip Code"})
     cores["Zip Code"] = cores["Zip Code"].astype(str)

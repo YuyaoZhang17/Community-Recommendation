@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from Ranking import ranking
+from DistanceRanking import DistRank, DistRank_F
 
 
 # %%
@@ -22,7 +23,12 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
 
     grades["Ranking of Crime"] = grades.pop("Safety")
     grades["Availability of Trains"] = grades.pop("Public Transportation")
-    grades["Driving Area"] = grades.pop("Traffic Situation")
+    grades["Driving Area"] = grades.pop("Driving")
+    grades["Cycling Area"] = grades.pop("Cycling")
+    grades["Walking Area"] = grades.pop("Walking")
+    grades["Driving Area of Family"] = grades.pop("Driving of Family")
+    grades["Cycling Area of Family"] = grades.pop("Cycling of Family")
+    grades["Walking Area of Family"] = grades.pop("Walking of Family")
     grades["Ranking of Delivery Restaurant"] = grades.pop(
         "Restaurant Delivery")
     grades["Ranking of Child Care"] = grades.pop("Child Care")
@@ -57,6 +63,7 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
     for i in range(len(sub_keys)):
         cur_ranks[sub_keys[i]] = cur_data[sub_keys[i]].iloc[0]
         new_ranks[sub_keys[i]] = new_data[sub_keys[i]].iloc[0]
+
         cur_score[sub_keys[i]] = weights[i]*cur_ranks[sub_keys[i]]
         new_score[sub_keys[i]] = weights[i]*new_ranks[sub_keys[i]]
         index[sub_keys[i]] = (new_score[sub_keys[i]] -
@@ -69,7 +76,12 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
 
     index["Safety"] = index.pop("Ranking of Crime")
     index["Public Transportation"] = index.pop("Availability of Trains")
-    index["Traffic Situation"] = index.pop("Driving Area")
+    index["Driving"] = index.pop("Driving Area")
+    index["Cycling"] = index.pop("Cycling Area")
+    index["Walking"] = index.pop("Walking Area")
+    index["Driving of Family"] = index.pop("Driving Area of Family")
+    index["Cycling of Family"] = index.pop("Cycling Area of Family")
+    index["Walking of Family"] = index.pop("Walking Area of Family")
     index["Restaurant Delivery"] = index.pop("Ranking of Delivery Restaurant")
     index["Child Care"] = index.pop("Ranking of Child Care")
     index["Elementary School"] = index.pop("Ranking of Elementary School")
@@ -78,7 +90,8 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
     index["Hospital"] = index.pop("Ranking of Hospital")
     index["Grocery | Freshness"] = index.pop("Ranking of Grocery|Freshness")
     index["Grocery | Bargain"] = index.pop("Ranking of Grocery|Bargain")
-    index["Total"] = (new_score["Total"]-cur_score["Total"])/cur_score["Total"]
+    index["Total"] = (new_score["Total"] -
+                      cur_score["Total"])/cur_score["Total"]
 
     for col in cols:
         cur_ranks[col] = cur_data[col].iloc[0]
@@ -90,7 +103,12 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
 
     grades["Safety"] = grades.pop("Ranking of Crime")
     grades["Public Transportation"] = grades.pop("Availability of Trains")
-    grades["Traffic Situation"] = grades.pop("Driving Area")
+    grades["Driving"] = grades.pop("Driving Area")
+    grades["Cycling"] = grades.pop("Cycling Area")
+    grades["Walking"] = grades.pop("Walking Area")
+    grades["Driving of Family"] = grades.pop("Driving Area of Family")
+    grades["Cycling of Family"] = grades.pop("Cycling Area of Family")
+    grades["Walking of Family"] = grades.pop("Walking Area of Family")
     grades["Restaurant Delivery"] = grades.pop(
         "Ranking of Delivery Restaurant")
     grades["Child Care"] = grades.pop("Ranking of Child Care")
@@ -110,7 +128,7 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
     return frame
 
 
-def gov_sti(zip_code: str, needs: dict, afford: float, address=None, data=df):
+def gov_sti(zip_code: str, needs: dict, afford: float, address=None, family_address=None, data=df):
 
     thre = afford*0.3
 
@@ -121,8 +139,21 @@ def gov_sti(zip_code: str, needs: dict, afford: float, address=None, data=df):
     data = safety_consideration(safety, data)
     # if user type in their address, creating traffic situation ranking dynamically
     if address != None:
-        data = data.merge(DistRank(address), on=[
-                          "Zip Code", "Driving Area", "Cycling Area", "Walking Area"], how="left")
+        a = DistRank(address)
+        data["Driving Area"] = a["Driving Area"]
+        data["Cycling Area"] = a["Cycling Area"]
+        data["Walking Area"] = a["Walking Area"]
+
+    else:
+        data = data
+
+    if family_address != None:
+        data = data.merge(DistRank_F(family_address)[["Zip Code", "Driving Area of Family", "Cycling Area of Family", "Walking Area of Family"]],
+                          on="Zip Code")
+    else:
+        data["Driving Area of Family"] = 0
+        data["Cycling Area of Family"] = 0
+        data["Walking Area of Family"] = 0
 
     # changes = pd.DataFrame(zip_codes, columns="Zip Code")
     changes = []
@@ -137,42 +168,46 @@ def gov_sti(zip_code: str, needs: dict, afford: float, address=None, data=df):
 # %%
 dic = {}
 
-dic["Availability of Bakery"] = 3
-dic["Rating of Bakery"] = 4
-dic["Price Level of Bakery"] = 2
-dic["Availability of Bar"] = 3
-dic["Rating of Bar"] = 2
-dic["Price Level of Bar"] = 3
-dic["Availability of Cafe"] = 3
-dic["Rating of Cafe"] = 3
-dic["Price Level of Cafe"] = 1
-dic["Child Care"] = 4
-dic["Elementary School"] = 5
-dic["Middle School"] = 3
-dic["High School"] = 2
-dic["Hospital"] = 3
-dic["Availability of Parks"] = 4
-dic["Public Transportation"] = 3
-dic["Availability of Pharmacy"] = 2
-dic["Restaurant Delivery"] = 3
-dic["Safety"] = 3
-dic["Availability of Sports Facility"] = 1
-dic["Traffic Situation"] = 5
-dic["Grocery | Freshness"] = 1
-dic["Grocery | Bargain"] = 1
+dic["Availability of Bakery"] = 0
+dic["Rating of Bakery"] = 0
+dic["Price Level of Bakery"] = 0
+dic["Availability of Bar"] = 0
+dic["Rating of Bar"] = 0
+dic["Price Level of Bar"] = 0
+dic["Availability of Cafe"] = 0
+dic["Rating of Cafe"] = 0
+dic["Price Level of Cafe"] = 0
+dic["Child Care"] = 10
+dic["Elementary School"] = 10
+dic["Middle School"] = 10
+dic["High School"] = 10
+dic["Hospital"] = 10
+dic["Availability of Parks"] = 10
+dic["Public Transportation"] = 10
+dic["Availability of Pharmacy"] = 10
+dic["Restaurant Delivery"] = 0
+dic["Safety"] = 10
+dic["Availability of Sports Facility"] = 0
+dic["Driving"] = 0
+dic["Cycling"] = 0
+dic["Walking"] = 10
+dic["Driving of Family"] = dic["Driving"]
+dic["Cycling of Family"] = dic["Cycling"]
+dic["Walking of Family"] = dic["Walking"]
+dic["Grocery | Freshness"] = 0
+dic["Grocery | Bargain"] = 10
 
 
-safety = ["Property | Burglary",
+safety = ["Violent | Sex Abuse",
           "Violent | Assault with Dangerous Weapon", "Violent | Homicide"]
 
 
 df = safety_consideration(safety, df)
 # %%
 
-aa = gov_sti("20002", dic, 300000, None, df)
+aa = gov_sti("20032", dic, 36400, address="1440 G st NW, Washington DC 20005",
+             family_address="1440 G st NW, Washington DC 20005", data=df)
 
 # %%
-b = aa[aa["Zip Code"] == "20005"]["Impact"].iloc[0]
+b = aa[aa["Zip Code"] == "20020"]["Impact"].iloc[0]
 print(b)
-
-# %%

@@ -2,7 +2,7 @@
 # %%
 import pandas as pd
 import numpy as np
-from DistanceRanking import DistRank
+from DistanceRanking import DistRank, DistRank_F
 from Ranking import ranking
 from Distance import distance
 import random
@@ -20,16 +20,30 @@ def safety_consideration(safety, data):
     return data
 
 
-def indexing(cur_zip: str, new_zip: str, grades, safety, address=None):
+def indexing(cur_zip: str, new_zip: str, grades, safety, address=None, family_address=None):
 
     data = safety_consideration(safety, df)
     if address != None:
-        data = data.merge(DistRank(address), on=[
-                          "Zip Code", "Driving Area", "Cycling Area", "Walking Area"], how="left")
+        a = DistRank(address)
+        data["Driving Area"] = a["Driving Area"]
+        data["Cycling Area"] = a["Cycling Area"]
+        data["Walking Area"] = a["Walking Area"]
+    if family_address != None:
+        data = data.merge(DistRank_F(family_address),
+                          on="Zip Code", how="outer")
+    else:
+        data["Driving Area of Family"] = 0
+        data["Cycling Area of Family"] = 0
+        data["Walking Area of Family"] = 0
 
     grades["Ranking of Crime"] = grades.pop("Safety")
     grades["Availability of Trains"] = grades.pop("Public Transportation")
-    grades["Driving Area"] = grades.pop("Traffic Situation")
+    grades["Driving Area"] = grades.pop("Driving")
+    grades["Cycling Area"] = grades.pop("Cycling")
+    grades["Walking Area"] = grades.pop("Walking")
+    grades["Driving Area of Family"] = grades["Driving Area"]
+    grades["Cycling Area of Family"] = grades["Cycling Area"]
+    grades["Walking Area of Family"] = grades["Walking Area"]
     grades["Ranking of Delivery Restaurant"] = grades.pop(
         "Restaurant Delivery")
     grades["Ranking of Child Care"] = grades.pop("Child Care")
@@ -63,7 +77,9 @@ def indexing(cur_zip: str, new_zip: str, grades, safety, address=None):
 
     index["Safety"] = index.pop("Ranking of Crime")
     index["Public Transportation"] = index.pop("Availability of Trains")
-    index["Traffic Situation"] = index.pop("Driving Area")
+    index["Driving"] = index.pop("Driving Area")
+    index["Cycling"] = index.pop("Cycling Area")
+    index["Walking"] = index.pop("Walking Area")
     index["Restaurant Delivery"] = index.pop("Ranking of Delivery Restaurant")
     index["Child Care"] = index.pop("Ranking of Child Care")
     index["Elementary School"] = index.pop("Ranking of Elementary School")
@@ -76,7 +92,9 @@ def indexing(cur_zip: str, new_zip: str, grades, safety, address=None):
 
     grades["Safety"] = grades.pop("Ranking of Crime")
     grades["Public Transportation"] = grades.pop("Availability of Trains")
-    grades["Traffic Situation"] = grades.pop("Driving Area")
+    grades["Driving"] = grades.pop("Driving Area")
+    grades["Cycling"] = grades.pop("Cycling Area")
+    grades["Walking"] = grades.pop("Walking Area")
     grades["Restaurant Delivery"] = grades.pop(
         "Ranking of Delivery Restaurant")
     grades["Child Care"] = grades.pop("Ranking of Child Care")
@@ -111,15 +129,17 @@ dic["Price Level of Cafe"] = 2
 dic["Child Care"] = 3
 dic["Elementary School"] = 5
 dic["Middle School"] = 3
-dic["High School"] = 2
+dic["High School"] = 8
 dic["Hospital"] = 3
 dic["Availability of Parks"] = 4
 dic["Public Transportation"] = 5
-dic["Availability of Pharmacy"] = 3
+dic["Availability of Pharmacy"] = 0
 dic["Restaurant Delivery"] = 5
 dic["Safety"] = 3
-dic["Availability of Sports Facility"] = 3
-dic["Traffic Situation"] = 5
+dic["Availability of Sports Facility"] = 10
+dic["Driving"] = 10
+dic["Cycling"] = 6
+dic["Walking"] = 3
 dic["Grocery | Freshness"] = 5
 dic["Grocery | Bargain"] = 3
 
@@ -128,7 +148,7 @@ safety = ["Property | Theft",
 
 # %%
 aa = indexing("20032", "20024", dic, safety,
-              "80 M St SE, Washington, DC 20003")
+              "80 M St SE, Washington, DC 20003", "1440 G ST NW, Washington DC 20005")
 print(aa)
 
 # %%

@@ -1,7 +1,7 @@
 # %%
 import pandas as pd
 import numpy as np
-from DistanceRanking import DistRank
+from DistanceRanking import DistRank,DistRank_F
 from Ranking import ranking
 from Distance import distance
 import random
@@ -28,7 +28,12 @@ def indexing2(zip_code: str, grades_dict, data):
 
     grades["Ranking of Crime"] = grades.pop("Safety")
     grades["Availability of Trains"] = grades.pop("Public Transportation")
-    grades["Driving Area"] = grades.pop("Traffic Situation")
+    grades["Driving Area"] = grades.pop("Driving")
+    grades["Cycling Area"]=grades.pop("Cycling")
+    grades["Walking Area"]=grades.pop("Walking")
+    grades["Driving Area of Family"] =grades["Driving Area"]
+    grades["Cycling Area of Family"]=grades["Cycling Area"]
+    grades["Walking Area of Family"]=grades["Walking Area"]
     grades["Ranking of Delivery Restaurant"] = grades.pop(
         "Restaurant Delivery")
     grades["Ranking of Child Care"] = grades.pop("Child Care")
@@ -38,6 +43,7 @@ def indexing2(zip_code: str, grades_dict, data):
     grades["Ranking of Hospital"] = grades.pop("Hospital")
     grades["Ranking of Grocery|Freshness"] = grades.pop("Grocery | Freshness")
     grades["Ranking of Grocery|Bargain"] = grades.pop("Grocery | Bargain")
+
     keys = list(grades)
 
     zip_data = data[data["Zip Code"] == zip_code]
@@ -52,7 +58,9 @@ def indexing2(zip_code: str, grades_dict, data):
     zip_score["Total"] = sum(zip_score.values())
     zip_score["Safety"] = zip_score.pop("Ranking of Crime")
     zip_score["Public Transportation"] = zip_score.pop("Availability of Trains")
-    zip_score["Traffic Situation"] = zip_score.pop("Driving Area")
+    zip_score["Driving"] = zip_score.pop("Driving Area")
+    zip_score["Cycling"]=zip_score.pop("Cycling Area")
+    zip_score["Walking"]=zip_score.pop("Walking Area")
     zip_score["Restaurant Delivery"] = zip_score.pop("Ranking of Delivery Restaurant")
     zip_score["Child Care"] = zip_score.pop("Ranking of Child Care")
     zip_score["Elementary School"] = zip_score.pop("Ranking of Elementary School")
@@ -65,7 +73,9 @@ def indexing2(zip_code: str, grades_dict, data):
 
     grades["Safety"] = grades.pop("Ranking of Crime")
     grades["Public Transportation"] = grades.pop("Availability of Trains")
-    grades["Traffic Situation"] = grades.pop("Driving Area")
+    grades["Driving"] = grades.pop("Driving Area")
+    grades["Cycling"]=grades.pop("Cycling Area")
+    grades["Walking"]=grades.pop("Walking Area")
     grades["Restaurant Delivery"] = grades.pop("Ranking of Delivery Restaurant")
     grades["Child Care"] = grades.pop("Ranking of Child Care")
     grades["Elementary School"] = grades.pop("Ranking of Elementary School")
@@ -84,15 +94,23 @@ def indexing2(zip_code: str, grades_dict, data):
     return frame[frame["Features"]=="Total"]["Area Score"].iloc[0]
 
 
-def select(user_type, age, income, safety, grades_dict,address=None,data=df):
+def select(user_type, age, income, safety, grades_dict,address=None,family_address=None,data=df):
 
     grades = grades_dict
 
     data = safety_consideration(safety, data)
     # if user type in their address, creating traffic situation ranking dynamically
     if address != None:
-        data = data.merge(DistRank(address), on=[
-                          "Zip Code", "Driving Area", "Cycling Area", "Walking Area"], how="left")
+        a=DistRank(address)
+        data["Driving Area"]=a["Driving Area"]
+        data["Cycling Area"]=a["Cycling Area"]
+        data["Walking Area"]=a["Walking Area"]
+    if family_address != None:
+        data=data.merge(DistRank_F(family_address),on="Zip Code",how="outer")
+    else:
+        data["Driving Area of Family"]=0
+        data["Cycling Area of Family"]=0
+        data["Walking Area of Family"]=0
 
     if age < 55:
         thre = income*0.30
@@ -129,36 +147,39 @@ def select(user_type, age, income, safety, grades_dict,address=None,data=df):
 #%%
 dic = {}
 
-dic["Availability of Bakery"] = 3
-dic["Rating of Bakery"] = 4
+dic["Availability of Bakery"] = 7
+dic["Rating of Bakery"] = 5
 dic["Price Level of Bakery"] = 2
 dic["Availability of Bar"] = 3
 dic["Rating of Bar"] = 2
 dic["Price Level of Bar"] = 0
 dic["Availability of Cafe"] = 3
 dic["Rating of Cafe"] = 3
-dic["Price Level of Cafe"] = 1
+dic["Price Level of Cafe"] = 6
 dic["Child Care"] = 4
 dic["Elementary School"] = 5
 dic["Middle School"] = 3
 dic["High School"] = 2
 dic["Hospital"] = 3
 dic["Availability of Parks"] = 4
-dic["Public Transportation"] = 3
+dic["Public Transportation"] = 10
 dic["Availability of Pharmacy"] = 2
 dic["Restaurant Delivery"] = 3
 dic["Safety"] = 3
-dic["Availability of Sports Facility"] = 1
-dic["Traffic Situation"] = 5
+dic["Availability of Sports Facility"] = 8
+dic["Driving"] = 10
+dic["Walking"]=6
+dic["Cycling"]=3
 dic["Grocery | Freshness"] = 1
 dic["Grocery | Bargain"] = 1
+
 
 
 safety=["Property | Theft","Violent | Assault with Dangerous Weapon", "Violent | Homicide"]
 #%%
 
-select("Home Buyer",45,1000000,["Violent | Homicide","Property | Arson","Violent | Sex Abuse"],dic,address="80 M St SE, Washington, DC 20003",data=df)
-
+bbb=select("Home Buyer",45,1000000,["Violent | Homicide","Property | Arson","Violent | Sex Abuse"],dic,address="80 M St SE, Washington, DC 20003",family_address="1440 G st NW, Washington DC 20005",data=df)
+print(bbb)
 #%%
 
 
@@ -166,6 +187,9 @@ def select_stu(safety,grades_dict,school=None,data=df):
     data=safety_consideration(safety,data)
     address=school
     grades=grades_dict
+    data["Driving Area of Family"]=0
+    data["Cycling Area of Family"]=0
+    data["Walking Area of Family"]=0
     data = data.merge(DistRank(address), on=["Zip Code", "Driving Area", "Cycling Area", "Walking Area"], how="left")
     for i in range(len(data)):
         grades_sub=grades
@@ -183,5 +207,4 @@ def select_stu(safety,grades_dict,school=None,data=df):
 #%%
 
 aa=select_stu(safety,dic,"The Georgetown University",df)
-print(aa)
-# %%
+#print(aa)
