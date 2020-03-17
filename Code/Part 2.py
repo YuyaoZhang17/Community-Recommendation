@@ -72,8 +72,13 @@ def indexing(cur_zip: str, new_zip: str, grades, safety, address=None, family_ad
         index[keys[i]] = (new_score[keys[i]] -
                           cur_score[keys[i]])/cur_score[keys[i]]
 
-    cur_score["Total"] = sum(cur_score.values())
-    new_score["Total"] = sum(new_score.values())
+    nan = np.nan
+    cur_copy = [x for x in cur_score.values() if not np.isnan(x)]
+
+    new_copy = [x for x in new_score.values() if not np.isnan(x)]
+
+    cur_score["Total"] = sum(cur_copy)
+    new_score["Total"] = sum(new_copy)
 
     index["Safety"] = index.pop("Ranking of Crime")
     index["Public Transportation"] = index.pop("Availability of Trains")

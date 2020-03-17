@@ -69,10 +69,19 @@ def indexing3(cur_zip: str, new_zip: str, grades, data):
         index[sub_keys[i]] = (new_score[sub_keys[i]] -
                               cur_score[sub_keys[i]])/cur_score[sub_keys[i]]
 
-    cur_score["Total"] = sum(
-        {key: value for key, value in cur_score.items() if key not in cols}.values())
-    new_score["Total"] = sum(
-        {key: value for key, value in new_score.items() if key not in cols}.values())
+    cur_selected = {key: value for key,
+                    value in cur_score.items() if key not in cols}
+
+    new_selected = {key: value for key,
+                    value in new_score.items() if key not in cols}
+
+    cur_copy = [x for x in cur_selected.values() if not np.isnan(x)]
+
+    new_copy = [x for x in new_selected.values() if not np.isnan(x)]
+
+    cur_score["Total"] = sum(cur_copy)
+
+    new_score["Total"] = sum(new_copy)
 
     index["Safety"] = index.pop("Ranking of Crime")
     index["Public Transportation"] = index.pop("Availability of Trains")
